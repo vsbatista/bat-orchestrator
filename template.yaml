@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  drs-sfn-orchestrator
+
+  DRS orchestrator function, launching recovery instances by wave tag thru Step Functions
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Runtime: python3.10
+    Handler: app.handler
+    Timeout: 20
+    Tracing: Active
+    Architectures:
+        - arm64
+    Environment:
+      Variables:
+        LOG_LEVEL: DEBUG
+
+Resources:
+  OrchestratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/orchestrator/
+      Handler: app.lambda_handler
+      Events:
+        HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /start
+            Method: get

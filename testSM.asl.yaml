@@ -1,0 +1,37 @@
+Comment: A description of my state machine
+StartAt: start-check
+States:
+  start-check:
+    Type: Task
+    Resource: arn:aws:states:::lambda:invoke
+    OutputPath: $.Payload
+    Parameters:
+      Payload.$: $
+      FunctionName: arn:aws:lambda:sa-east-1:475330560614:function:testefunction:$LATEST
+    Retry:
+      - ErrorEquals:
+          - Lambda.ServiceException
+          - Lambda.AWSLambdaException
+          - Lambda.SdkClientException
+          - Lambda.TooManyRequestsException
+        IntervalSeconds: 2
+        MaxAttempts: 6
+        BackoffRate: 2
+    Next: isrunning
+  isrunning:
+    Type: Choice
+    Choices:
+      - Variable: $.status
+        StringEquals: done
+        Next: done
+        Comment: Flow is done - all waves processed
+    Comment: Check for last execution state and take next action
+    Default: Wait
+  Wait:
+    Type: Wait
+    Seconds: 60
+    Next: start-check
+    Comment: move back to check
+  done:
+    Type: Pass
+    End: true
