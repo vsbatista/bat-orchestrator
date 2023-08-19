@@ -24,9 +24,63 @@ Resources:
     Properties:
       CodeUri: functions/orchestrator/
       Handler: app.lambda_handler
+      Policies:
+        - Statement: 
+          - Sid: OrachestratorFunctionPolicy
+            Action:
+            - ec2:AttachVolume
+            - ec2:AuthorizeSecurityGroupIngress
+            - ec2:DeleteSnapshot
+            - ec2:DescribeInstances
+            - ec2:DescribeInstanceAttribute
+            - ec2:DescribeSnapshots
+            - drs:TagResource
+            - ec2:DeleteVolume
+            - iam:PassRole
+            - drs:StartRecovery
+            - drs:DescribeJobs
+            - ec2:StartInstances
+            - ec2:DescribeAvailabilityZones
+            - ec2:RevokeSecurityGroupEgress
+            - ec2:DescribeVolumes
+            - ec2:CreateSnapshot
+            - ec2:DescribeAccountAttributes
+            - ec2:DeleteLaunchTemplateVersions
+            - ec2:ModifyInstanceAttribute
+            - ec2:DescribeInstanceStatus
+            - ec2:DetachVolume
+            - ec2:AuthorizeSecurityGroupEgress
+            - drs:UntagResource
+            - ec2:TerminateInstances
+            - drs:DescribeSourceServers
+            - ec2:DescribeLaunchTemplates
+            - drs:ListTagsForResource
+            - ec2:CreateTags
+            - ec2:DescribeLaunchTemplateVersions
+            - ec2:RunInstances
+            - drs:DescribeJobLogItems
+            - ec2:StopInstances
+            - ec2:DescribeSecurityGroups
+            - ec2:CreateLaunchTemplateVersion
+            - ec2:CreateVolume
+            - ec2:DescribeImages
+            - ec2:CreateLaunchTemplate
+            - drs:CreateRecoveryInstanceForDrs
+            - ec2:DescribeInstanceTypes
+            - ec2:ModifyLaunchTemplate
+            - ec2:DescribeSubnets
+            Effect: Allow
+            Resource: "*"
+
       Events:
         HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /start
             Method: get
+  OrchestratorStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/orchestrator.asl.yaml
+      DefinitionSubstitutions:
+        OrchestratorFunctionArn: !GetAtt OrchestratorFunction.Arn

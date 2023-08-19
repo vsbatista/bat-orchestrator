@@ -1,0 +1,62 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "OrchestratorFunction - Initial request",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "template.yaml",
+                "logicalId": "OrchestratorFunction"
+            },
+            "lambda": {
+                "payload": {},
+                "environmentVariables": {}
+            },
+            "aws": {
+                "credentials": "profile:cliente3",
+                "region": "sa-east-1"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "OrchestratorFunction - Wave running",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "template.yaml",
+                "logicalId": "OrchestratorFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "path": "events/test-execution-running.json"
+                },
+                "environmentVariables": {}
+            },
+            "aws": {
+                "credentials": "profile:cliente3",
+                "region": "sa-east-1"
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "OrchestratorFunction - Wave finished",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "template.yaml",
+                "logicalId": "OrchestratorFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "path": "events/test-execution-finished-wave.json"
+                },
+                "environmentVariables": {}
+            },
+            "aws": {
+                "credentials": "profile:cliente3",
+                "region": "sa-east-1"
+            }
+        }
+    ]
+}
