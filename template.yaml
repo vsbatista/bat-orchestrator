@@ -84,3 +84,10 @@ Resources:
       DefinitionUri: statemachine/orchestrator.asl.yaml
       DefinitionSubstitutions:
         OrchestratorFunctionArn: !GetAtt OrchestratorFunction.Arn
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+            Resource:
+              - !GetAtt OrchestratorFunction.Arn
