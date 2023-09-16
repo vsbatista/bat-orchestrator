@@ -72,12 +72,6 @@ Resources:
             Effect: Allow
             Resource: "*"
 
-      Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /start
-            Method: get
   OrchestratorStateMachine:
     Type: AWS::Serverless::StateMachine
     Properties:
@@ -91,3 +85,54 @@ Resources:
               - lambda:InvokeFunction
             Resource:
               - !GetAtt OrchestratorFunction.Arn
+  
+  #Lambda to control state machine initialization
+  StateMachineControllerLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/stateMachineController/
+      Handler: app.lambda_handler
+      Policies:
+        - Statement: 
+          - Sid: AllowLambdaCallStateMachine
+            Action:
+            - states:ListExecutions
+            - states:StartExecution
+            Effect: Allow
+            Resource: !GetAtt OrchestratorStateMachine.Arn
+      Environment:
+        Variables:
+          STATEMACHINE_ARN: !GetAtt OrchestratorStateMachine.Arn
+      Events:
+        StateMachineControllerApi:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /start
+            Method: post
+
+  # #API
+  # #role to invoke state machine
+  # ApiGatewayToStepFunctionRole:
+  #   Type: "AWS::IAM::Role"
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: "Allow"
+  #           Principal:
+  #             Service: "apigateway.amazonaws.com"
+  #           Action: 
+  #             - "sts:AssumeRole"
+  #     Policies:
+  #       - PolicyName: ApiDirectInvokeStepFunction
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #             Action:
+  #             - "states:ListStateMachines",
+  #             - "states:ListActivities",
+  #             - "states:ListExecutions",
+  #             - "states:StartExecution"
+  #             Effect: Allow
+  #             Resource:
+  #               - !Ref OrchestratorStateMachine
